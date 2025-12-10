@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Glitch Prank</title>
+<style>
+body {
+    margin:0;
+    background:black;
+    color:#ff3b3b;
+    font-family:monospace;
+    font-size:26px;
+    text-align:center;
+    padding-top:120px;
+    white-space:pre-line;
+    user-select:none;
+    overflow:hidden;
+    transition: background 0.3s;
+}
+#startBtn {
+    padding:14px 32px;
+    font-size:22px;
+    background:#111;
+    border:2px solid red;
+    color:red;
+    cursor:pointer;
+}
+.glitch {
+    animation: glitchAnim 0.3s infinite;
+}
+@keyframes glitchAnim {
+    0% { transform: translate(0); color: #ff3b3b; }
+    25% { transform: translate(-2px,1px); color: #00f; }
+    50% { transform: translate(2px,-1px); color: #ff3b3b; }
+    75% { transform: translate(-1px,2px); color: #00f; }
+    100% { transform: translate(0); color: #ff3b3b; }
+}
+</style>
+</head>
+<body>
+
+<div id="screen">
+    GIVE ME CONTROL<br><br>
+    <button id="startBtn">ДА</button>
+</div>
+
+<!-- Аудио -->
+<audio id="glitchSound" src="Null.demension.mp3" preload="auto"></audio>
+
+<script>
+const button = document.getElementById("startBtn");
+const screen = document.getElementById("screen");
+const sound = document.getElementById("glitchSound");
+
+button.onclick = function() {
+    // Сразу запускаем звук (только здесь Chrome/Firefox разрешает)
+    sound.currentTime = 0;
+    sound.volume = 1.0;
+    sound.play().catch(()=>{console.log("Ошибка воспроизведения");});
+
+    // Мягкая вибрация
+    if(navigator.vibrate) navigator.vibrate([100,50,100]);
+
+    // Убираем кнопку
+    button.style.display = 'none';
+    screen.innerHTML = '';
+
+    // Ошибки ERROR 1-20
+    let i = 1;
+    function spamError() {
+        if(i <= 20){
+            screen.innerHTML += `<div class="glitch">ERROR ${i}</div>`;
+            i++;
+            if(navigator.vibrate) navigator.vibrate(20);
+            setTimeout(spamError, 100);
+        } else {
+            // 29 секунд мягкого глича
+            let startTime = Date.now();
+            const glitchInterval = setInterval(() => {
+                screen.innerHTML = `<div class="glitch">SYSTEM GLITCH...</div>`;
+                document.body.style.background = ['#111','#222','#000'][Math.floor(Math.random()*3)];
+                if(navigator.vibrate) navigator.vibrate(15);
+
+                if(Date.now() - startTime >= 29000){ // 29 секунд
+                    clearInterval(glitchInterval);
+                    screen.innerHTML = `<div class="glitch">SELF-DESTRUCTION...</div>`;
+                    if(navigator.vibrate) navigator.vibrate([300,100,300]);
+                    setTimeout(()=>{
+                        screen.innerHTML = "Это был пранк,\nесли ты поверил, то ты ребёнок";
+                        document.body.style.background = 'black';
+                        sound.pause();
+                    },3000);
+                }
+            },200);
+        }
+    }
+    spamError();
+};
+</script>
+
+</body>
+</html>
